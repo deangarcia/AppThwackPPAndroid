@@ -10,6 +10,7 @@ public class InitStates extends AndroidLaunch {
 
 	@Test
 	public void TestScenario() throws InterruptedException {
+		// Just testing to see if the capabilities were working so I put a small test
 		tap(waitForElementName("Settings Button",60));
 		/*
 		for (MVPD mvpds : mvpd) {

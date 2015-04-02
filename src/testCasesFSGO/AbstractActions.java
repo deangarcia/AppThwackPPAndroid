@@ -12,72 +12,117 @@ public class AbstractActions extends AndroidLaunch {
 	private void pressButton(String name){
 		while (!(ele_.isDisplayed())) {
 			driver.tap(1, 290, 210, 1);
-			tap( waitForElementName(name,15));	
+			tap(waitForElementName(name,15));	
 			break;
 		}
-		
 	}
+	
 	public void loginAccountSettings (String accountName) {
 		
-		tap(waitForElementName("Settings Button",60));
-		//sign in
-		tap (waitForElementResourceId("//UIAApplication[1]/UIAWindow[1]/UIATableView[1]/"
-				+ "UIATableCell[1]/UIAStaticText[1]",60));
+		/*
+		 * Resource ID's still need to be found for all the elements on Android
+		 */
+		
+		// setting button
+		tap(waitForElementName("SETTINGS BUTTON",60));
+		
+		// sign in
+		tap (waitForElementResourceId("SIGN IN FROM SETTINGS MENU",60));
+		
+		//sleep is to wait for the screen to load before swiping still need to 
+		//implement a better way of waiting for this besides a sleep
 		try {
 			Thread.sleep(3000);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		/*
+		 * Still working on trying to make these x and y attributes dynamic ideas:
+		 * 1. Have these values hard coded into the same property files as the capabilities 
+		 *    file then read in from there
+		 * 2. At the start of the program find the element which is at the lowest level of the 
+		 *    XML tree (The background image of the app) and get the dimensions for that element
+		 */
+		
+		// The swipe here is not necessary for larger phones so how can this action be made dynamic?
 		//driver.swipe(225,500,225,250,3000);
 		driver.swipe(290, 420, 290, 234, 3000);
+		
 		//more providers
-		tap(waitForElementResourceId("//UIAApplication[1]/UIAWindow[1]/UIACollectionView[1]/"
-				+ "UIAButton[2]",60));
-		//at&t
+		tap(waitForElementResourceId("CLICK THE MORE PROVIDERS OPTION",60));
+	
 		// Scroll to works when invisible elements are present in the DOM
-		// We know that elements are present on the DOM if they have a y coordinate 
-		// Location, 
+		// I noticed that elements with y coordinates are considered visible 
+		// When using this scroll to method. This was for the IPhone not sure 
+		// If it will work the same on Android if it does not then the same swiping
+		// technique used for the videos should be used 
 		driver.scrollTo(accountName);
 		tap(waitForElementName(accountName,60));
 	}
 	
 	public boolean login(Accounts account) {
+		
+		/*
+		 * Resource ID's still need to be found for all the elements on Android
+		 */
+		
 		//username
-		WebElement element = waitForElementResourceId("//UIAApplication[1]/UIAWindow[1]/"
-				+ "UIAScrollView[1]/UIAWebView[1]/UIATextField[1]",60);
+		WebElement element = waitForElementResourceId("USERNAME FIELD",60);
 		click(element);
 		element.sendKeys(account.getUsername());
 		
 		//password
-		element = waitForElementResourceId("//UIAApplication[1]/UIAWindow[1]/UIAScrollView[1]/"
-				+ "UIAWebView[1]/UIATextField[2]",60);
+		element = waitForElementResourceId("PASSWORD FIELD",60);
 		click(element);
 		element.sendKeys(account.getPassword());
 		
 		//done
-		tap(waitForElementResourceId("//UIAApplication[1]/UIAWindow[2]/UIAToolbar[1]/UIAButton[3]",60));
+		tap(waitForElementResourceId("CLICK DONE ON KEYBOARD",60));
 		
 		//click Sign-In	
-		tap(waitForElementResourceId("//UIAApplication[1]/UIAWindow[1]/UIAScrollView[1]/"
-				+ "UIAWebView[1]/UIAButton[1]",60));
-		
+		tap(waitForElementResourceId("SIGN BUTTON",60));
 		
 		try{
 			  Thread.sleep(1000);
 			  //driver.swipe(225,500,225,250,3000);
 			  driver.swipe(290, 420, 290, 234, 3000);
-			  waitForElementResourceId("//UIAApplication[1]/UIAWindow[1]/UIAScrollView[1]/"
-			  		+ "UIAWebView[1]/UIAButton[1]",15).isEnabled();
+			  waitForElementResourceId("CHECK TO SEE IF THE SIGN IN BUTTON IS STILL AVAILABLE",15).isEnabled();
 		} catch (Exception e) {
 			return true;
 		}
 		
-		return false;
-		
+		return false;	
 	}
 	
+	/*
+    Same code as above but different approach in vid is the length of a list that contains elements that have 
+    The value ONNOW in them this means the amount of playable videos and the code manually scrolls through that 
+    Many times since each video container is 186 pixels from top to bottom swipe down that far then click in the middle 
+    Of that container to play the video. Was considering this approach for Android because unlike IOS resourceIds for 
+    videos were not being displayed in the DOM before scrolling. So the idea is to scroll and play videos up until a element 
+    appears that has a name share which is one of the options that pops up when a video is not on now. If that element is not 
+    found throw the elementNotFound exception.
+    
+    problems occur with random ads that are placed in between videos like banners need to find a way to detect these ads
+    
+    public static void playVideo(int vid) throws NoSuchElementException, TimeoutException {
+	
+	for(int i = 0; i <= vid; i++)
+	{
+		// If we are on the first video we do not want to swipe at all
+		if(i != 0)
+			driver.swipe(290, 420, 290, 234, 3000);
+	}
+	driver.tap(1, 195, 290, 1);
+	// Swipe to get more providers
+}
+*/
+	
 	public void playVideos() throws InterruptedException {
+		/* Check to see if the resourceId layout is the same as xPath in structure if it is
+		 * then use same logic and change xPaths to resourceIds otherwise change
+		 */
 		String xpath="";
 		Thread.sleep(5000);
 		int i=1;
@@ -114,37 +159,18 @@ public class AbstractActions extends AndroidLaunch {
 			}
 			i++;
 		}
-		
-		
 	}
 	
 	public void logout(){
-		tap(waitForElementResourceId("//UIAApplication[1]/UIAWindow[1]/UIANavigationBar[1]/UIAButton[4]",60));
-		tap(waitForElementResourceId("//UIAApplication[1]/UIAWindow[1]/UIATableView[1]/"
-				+ "UIATableCell[1]/UIAStaticText[1]",60));
+		tap(waitForElementResourceId("SETTINGS BUTTON TOP RIGHT OF APP",60));
+		tap(waitForElementResourceId("SIGN OUT OPTION IN THE SETTINGS DROP DOWN MENU",60));
 		tap(waitForElementName("OK",60));
 	}
 	
+	// Path to the collection cell which contains a list of video containers 
 	private String video_xpath = "//UIAApplication[1]/UIAWindow[1]/UIACollectionView[2]/"
 			+ "UIACollectionCell[1]/UIACollectionView[1]/UIACollectionCell";
 	
+	// When video is playing and the control options are available then this element should be seen
 	private WebElement ele_ = driver.findElement(By.xpath("//UIAApplication[1]/UIAWindow[1]/UIAStaticText[1]"));
-	
-	/*
-	// Same code as above but different approach in vid is the length of a list that contains elements that have 
-	// The value ONNOW in them this means the amount of playable videos and the code manually scrolls through that 
-	// Many times since each video container is 186 pixels from top to bottom swipe down that far then click in the middle 
-	// Of that container to play the video
-		public static void playVideo(int vid) throws NoSuchElementException, TimeoutException {
-		
-		for(int i = 0; i <= vid; i++)
-		{
-			// If we are on the first video we do not want to swipe at all
-			if(i != 0)
-				driver.swipe(290, 420, 290, 234, 3000);
-		}
-		driver.tap(1, 195, 290, 1);
-		// Swipe to get more providers
-	}
-	*/
 }

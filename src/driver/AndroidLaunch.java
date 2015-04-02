@@ -5,14 +5,16 @@ import fileReaders.PropertiesReader;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.remote.MobileCapabilityType;
-import io.selendroid.SelendroidDriver;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Properties;
+
 import objects.MVPD;
+
 import org.apache.commons.io.FileUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -27,10 +29,13 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 public abstract class AndroidLaunch {
+	
 	@BeforeClass
 	public static void androidAppthwackServer() throws Throwable 
 	{
 		JsonRead.readJsonFromFile("/Users/deang/Documents/workspace/AppThwackPilotProject/resources/read.json");
+		// Properties properties = PropertiesReader.getPropertiesFile("Galaxy III");
+		// Each phone can have its own property file for the capabilities set up
 		Properties properties = PropertiesReader.getPropertiesFile("capabilities");
 		String dn = properties.getProperty("deviceName");
 		String pv = properties.getProperty("platformVersion");
@@ -63,8 +68,14 @@ public abstract class AndroidLaunch {
 		File calsspathRoot = new File(System.getProperty("user.dir")); 
 		File appDir = new File(calsspathRoot, "Application");
 		File app = new File(appDir, "FSGOAndroid.apk");
+		String xmlPath = System.getProperty("user.dir") + "resources" + "read.json";
+		JsonRead.readJsonFromFile(xmlPath);
 		
-		JsonRead.readJsonFromFile("/Users/deang/Documents/workspace/AppThwackPilotProject/resources/read.json");
+		/*
+		 * Was having issues here with the Samsung Galaxy III because the software is below
+		 * level 17. Appium log says to use Selendroid however the Selendroid driver does not 
+		 * have built in methods like tap.
+		 */
 		Properties properties = PropertiesReader.getPropertiesFile("capabilities");
 		String pn = properties.getProperty("platformName");
 		String pv = properties.getProperty("platformVersion");
@@ -89,31 +100,27 @@ public abstract class AndroidLaunch {
 	@AfterClass
 	public static void tearDown() throws Exception 
 	{ 	
-		//
 		driver.quit();
 	}
 	
-	public WebElement waitForElementResourceId(String xpath,int waitTime) {
+	public WebElement waitForElementResourceId(String rId,int waitTime) {
 		wait = new WebDriverWait(driver, waitTime);
 		WebElement element = wait
 				.until(ExpectedConditions.elementToBeClickable(By
-						.xpath(xpath)));
+						.xpath(rId)));
 		return element;
-		
 	}
 	
 	public WebElement waitForElementName(String name,int waitTime) {
-		
-		//
 		wait = new WebDriverWait(driver, waitTime);
 		WebElement element = wait
 				.until(ExpectedConditions.elementToBeClickable(By
 						.name(name)));
 		return element;
 	}
+	
 	public static void tap(WebElement element) {
-		//
-		((AppiumDriver) driver).tap(1, element, 1);
+		driver.tap(1, element, 1);
 	}
 
 	public static void click(WebElement element) {
@@ -129,10 +136,8 @@ public abstract class AndroidLaunch {
 				.getScreenshotAs(OutputType.FILE);
 		System.out.println("Screenshot completed");
 		try{
-
 			File calsspathRoot = new File(System.getProperty("user.dir")); 
 			//workspace space is set in application folder
-			
 			File testScreenShot = new File(calsspathRoot + "screenShots", "preRollAds");
 			// Copy the file to screenshot folder
 			FileUtils.copyFile(scrFile, testScreenShot);
@@ -146,8 +151,4 @@ public abstract class AndroidLaunch {
 	public static RemoteWebDriver drive;
 	public static WebDriverWait wait;
 	public static ArrayList<MVPD>mvpd = new ArrayList<MVPD>();
-	
-	// This is one of the initial layers of the app, on ios 5 build it has dimension dimensions are
-	// not on the ios 4 though if all builds of the apps initial layer had dimensions then it would have to 
-	// be fit for the screen and we could use that to make our swipe methods dynamic
 }
